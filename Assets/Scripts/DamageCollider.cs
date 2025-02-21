@@ -7,8 +7,9 @@ namespace SG
 {
     public class DamageCollider : MonoBehaviour
     {
-
+        public GameObject character;
         public Collider damageCollider;
+        public Collider characterCollider;
 
         public int currentWeaponDamage = 25;
 
@@ -18,8 +19,19 @@ namespace SG
             damageCollider.gameObject.SetActive(true);
             damageCollider.isTrigger = true;
             damageCollider.enabled = false;
-        }
 
+            Transform rootTransform = transform.root; // Get the root object (the boss)
+
+            if (rootTransform.CompareTag("Enemy")) // Ensure this is an enemy's weapon
+            {
+                Collider[] bossColliders = rootTransform.GetComponentsInParent<Collider>(); // Get all boss colliders
+
+                foreach (Collider bossCollider in bossColliders)
+                {
+                    Physics.IgnoreCollision(damageCollider, bossCollider);
+                }
+            }
+        }
         public void EnableDamageCollider()
         {
             damageCollider.enabled = true;
@@ -32,27 +44,27 @@ namespace SG
 
         private void OnTriggerEnter(Collider collision)
         {
-            if(collision.tag == "Hittable")
+            // Get the root of the object this script is attached to (likely the boss)
+            Transform rootTransform = transform.root;
+
+            if (rootTransform.CompareTag("Enemy") && collision.CompareTag("Player"))
             {
                 PlayerStats playerStats = collision.GetComponent<PlayerStats>();
-
-
-                if(playerStats != null)
+                if (playerStats != null)
                 {
                     playerStats.TakeDamage(currentWeaponDamage);
                 }
             }
 
-            if(collision.tag == "Enemy")
+            if (rootTransform.CompareTag("Player") && collision.CompareTag("Enemy"))
             {
                 EnemyStats enemyStats = collision.GetComponent<EnemyStats>();
-
-                if(enemyStats != null)
+                if (enemyStats != null)
                 {
                     enemyStats.TakeDamage(currentWeaponDamage);
                 }
-                
             }
         }
+
     }
 }

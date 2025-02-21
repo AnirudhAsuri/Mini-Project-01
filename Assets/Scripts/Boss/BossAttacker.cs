@@ -5,6 +5,8 @@ namespace SG
     public class BossAttacker : MonoBehaviour
     {
         private Animator anim;
+        private PlayerInventory playerInventory;
+        private WeaponSlotManager weaponSlotManager;
         private AnimatorManager animatorManager;
         private BossLocomotion bossLocomotion;
         private Transform playerTransform;
@@ -16,6 +18,8 @@ namespace SG
 
         private void Awake()
         {
+            playerInventory = GetComponent<PlayerInventory>();
+            weaponSlotManager = GetComponentInChildren<WeaponSlotManager>();
             anim = GetComponentInChildren<Animator>();
             animatorManager = GetComponentInChildren<AnimatorManager>();
             bossLocomotion = GetComponent<BossLocomotion>();
@@ -31,19 +35,19 @@ namespace SG
             
             if (Vector3.Distance(transform.position, playerTransform.position) < 3f)
             {
-                Attack();
+                Attack(playerInventory.rightWeapon);
                 Debug.Log("Attacking");
             }
         }
 
-        private void Attack()
+        private void Attack(WeaponItem weapon)
         {
             // Use AnimatorManager to play attack animation
-            string[] attackAnimations = { "OH_Light_Attack_01 Boss", "OH_Light_Attack_02 Boss" };
+            string[] attackAnimations = { weapon.OH_Light_Attack_1, weapon.OH_Light_Attack_2 };
 
             // Select a random attack animation from the array
             string attackAnim = attackAnimations[Random.Range(0, attackAnimations.Length)];
-
+            weaponSlotManager.attackingWeapon = weapon;
             animatorManager.PlayTargetAnimation(attackAnim, true);
             Debug.Log(attackAnim);// Set isInteracting to true for root motion
         }

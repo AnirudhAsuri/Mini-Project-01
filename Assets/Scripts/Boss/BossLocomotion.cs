@@ -1,47 +1,63 @@
 using UnityEngine;
 
-
 namespace SG
 {
     public class BossLocomotion : MonoBehaviour
     {
         Animator bossAnimator;
-
         public Transform playerTransform;
         public Rigidbody bossRigidBody;
         public float moveSpeed = 3f;
         public float rotationSpeed = 0.5f;
+        public float strafeSpeed = 1.5f; // Slower speed for strafing
+        public float strafeDistance = 6f; // Start strafing when within this range
 
         private void Update()
         {
-            MoveTowardsTarget(moveSpeed, Vector3.up);
+            float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+            if (distanceToPlayer <= strafeDistance)
+            {
+                StrafeForward();
+            }
+            else
+            {
+                MoveTowardsTarget(moveSpeed);
+            }
         }
+
         private void Awake()
         {
             bossAnimator = GetComponentInChildren<Animator>();
             bossRigidBody = GetComponent<Rigidbody>();
         }
 
-        public void MoveTowardsTarget(float moveSpeed, Vector3 normalVector)
+        public void MoveTowardsTarget(float speed)
         {
             Vector3 targetPosition = playerTransform.position;
-            Vector3 moveDirection;
-
-        
-                moveDirection = (targetPosition - transform.position).normalized;
-                moveDirection.y = 0; // Prevent unnecessary vertical movement
-
-                moveDirection *= moveSpeed;
-                // Project movement onto the ground pla
-            bossRigidBody.velocity = moveDirection;
+            Vector3 moveDirection = (targetPosition - transform.position).normalized;
+            moveDirection.y = 0;
+            bossRigidBody.velocity = moveDirection * speed;
 
             Vector3 localMoveDirection = transform.InverseTransformDirection(moveDirection);
-
             bossAnimator.SetFloat("Horizontal", localMoveDirection.x, 0.1f, Time.deltaTime);
-            bossAnimator.SetFloat("Vertical", localMoveDirection.z, 0.1f, Time.deltaTime);
+            bossAnimator.SetFloat("Vertical", Mathf.Clamp(speed / moveSpeed, 0.5f, 1f), 0.1f, Time.deltaTime);
 
             HandleRotation();
+        }
 
+        private void StrafeForward()
+        {
+            Vector3 targetPosition = playerTransform.position;
+            Vector3 moveDirection = (targetPosition - transform.position).normalized;
+            moveDirection.y = 0;
+            bossRigidBody.velocity = moveDirection * strafeSpeed; // Move forward but slower
+
+            Vector3 localMoveDirection = transform.InverseTransformDirection(moveDirection);
+            bossAnimator.SetFloat("Horizontal", localMoveDirection.x, 0.1f, Time.deltaTime);
+            bossAnimator.SetFloat("Vertical", Mathf.Clamp(strafeSpeed / moveSpeed, 0.5f, 1f), 0.1f, Time.deltaTime);
+
+            HandleRotation();
         }
 
         public void HandleRotation()
@@ -51,9 +67,8 @@ namespace SG
             targetDirection.y = 0;
             targetDirection.Normalize();
 
-            Quaternion tr = Quaternion.LookRotation(targetDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, tr, rotationSpeed / Time.deltaTime);
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 }
-
