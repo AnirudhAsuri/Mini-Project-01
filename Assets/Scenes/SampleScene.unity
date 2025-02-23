@@ -1797,6 +1797,8 @@ GameObject:
   - component: {fileID: 1084037997}
   - component: {fileID: 1084037998}
   - component: {fileID: 1084037999}
+  - component: {fileID: 1084038000}
+  - component: {fileID: 1084038001}
   m_Layer: 0
   m_Name: Boss
   m_TagString: Enemy
@@ -1868,6 +1870,7 @@ Transform:
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 1626346027}
+  - {fileID: 1558218820}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1084037996
@@ -1882,6 +1885,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d8717c41142bcb643bd6cdfcd8340836, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockOnTransform: {fileID: 1558218820}
   playerTransform: {fileID: 988283953}
   bossRigidBody: {fileID: 0}
   moveSpeed: 6
@@ -1921,6 +1925,8 @@ MonoBehaviour:
   maxHealth: 0
   currentHealth: 0
   isDead: 0
+  bossLocomotion: {fileID: 0}
+  bossDodgeHandler: {fileID: 0}
   bossHealthBar: {fileID: 2000834144}
   isBoss: 1
 --- !u!114 &1084037999
@@ -1937,6 +1943,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   rightWeapon: {fileID: 11400000, guid: 5e3fa9a3caa760343bb7aecc66d6711d, type: 2}
   leftWeapon: {fileID: 0}
+--- !u!114 &1084038000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084037992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 212679605d52e2d41997955cd384709e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dodgeWeight: 0.2
+  dodgeCooldown: 1
+  dodgeCheckInterval: 2
+  dodgeDistanceThreshold: 6
+--- !u!114 &1084038001
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1084037992}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c59e2150d74e02e4c9f1d8b3bef39686, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  aggressionThreshold: 6
+  attackPatternThreshold: 3
 --- !u!1 &1250434309 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 622829048531759482, guid: 99acef1ac5a29a04dac376f3d5913d86, type: 3}
@@ -2123,6 +2159,37 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1558218819
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1558218820}
+  m_Layer: 0
+  m_Name: Lock On Transform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1558218820
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1558218819}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 1.292, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1084037995}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1590495665
 GameObject:

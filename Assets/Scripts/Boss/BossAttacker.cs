@@ -10,11 +10,11 @@ namespace SG
         private AnimatorManager animatorManager;
         private BossLocomotion bossLocomotion;
         private Transform playerTransform;
+        private BossDodgeHandler bossDodgeHandler; // Reference to BossDodgeHandler
 
-        public float attackRange = 5f; // Maximum distance for the SphereCast
-        public float attackRadius = 1f; // Radius of the SphereCast
+        public float attackRange = 5f; // Maximum distance for attack
+        public float attackRadius = 1f; // Radius for attack check
         public string[] attackAnimations = { "OH_Light_Attack_01 Boss", "OH_Light_Attack_02 Boss" }; // Attack choices
-        private bool isAttacking;
 
         private void Awake()
         {
@@ -24,33 +24,40 @@ namespace SG
             animatorManager = GetComponentInChildren<AnimatorManager>();
             bossLocomotion = GetComponent<BossLocomotion>();
             playerTransform = bossLocomotion.playerTransform; // Get player reference
+            bossDodgeHandler = BossDodgeHandler.Instance; // Get dodge handler reference
         }
 
         private void Update()
         {
             if (anim.GetBool("isInteracting"))
-                return; // Prevent multiple attacks
+                return; // Prevent multiple actions at once
 
-            // Perform the SphereCast
-            
-            if (Vector3.Distance(transform.position, playerTransform.position) < 3f)
+            float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+
+            if (distanceToPlayer < 3f)
             {
-                Attack(playerInventory.rightWeapon);
-                Debug.Log("Attacking");
+                // Check if boss should dodge instead of attacking based on weight
+                if (bossDodgeHandler != null && Random.value < bossDodgeHandler.dodgeWeight)
+                {
+                    bossDodgeHandler.TryDodge();
+                    Debug.Log("Dodging instead of Attacking");
+                }
+                else
+                {
+                    Attack(playerInventory.rightWeapon);
+                    Debug.Log("Attacking");
+                }
             }
         }
 
         private void Attack(WeaponItem weapon)
         {
-            // Use AnimatorManager to play attack animation
-            string[] attackAnimations = { weapon.OH_Light_Attack_1, weapon.OH_Light_Attack_2 };
+            if (weapon == null) return;
 
-            // Select a random attack animation from the array
-            string attackAnim = attackAnimations[Random.Range(0, attackAnimations.Length)];
+            // Pick a random attack animation
+            string attackAnim = Random.value > 0.5f ? weapon.OH_Light_Attack_1 : weapon.OH_Light_Attack_2;
             weaponSlotManager.attackingWeapon = weapon;
             animatorManager.PlayTargetAnimation(attackAnim, true);
-            Debug.Log(attackAnim);// Set isInteracting to true for root motion
         }
     }
 }
-

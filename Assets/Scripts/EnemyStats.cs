@@ -1,11 +1,12 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SG
 {
     public class EnemyStats : CharacterStats
     {
+        public BossLocomotion bossLocomotion;
+        public BossDodgeHandler bossDodgeHandler;
         public BossHealthBar bossHealthBar; // Reference to boss health UI
         public bool isBoss = false; // Mark if this enemy is a boss
 
@@ -13,6 +14,8 @@ namespace SG
 
         private void Awake()
         {
+            bossDodgeHandler = GetComponent<BossDodgeHandler>();
+            bossLocomotion = GetComponent<BossLocomotion>();
             animator = GetComponentInChildren<Animator>();
 
             if (isBoss) // Only assign health bar if this is a boss
@@ -50,11 +53,18 @@ namespace SG
                 bossHealthBar.SetCurrentHealth(currentHealth);
             }
 
+            // Notify PlayerCombatTracker that the boss was hit
+            if (isBoss)
+            {
+                PlayerCombatTracker.Instance?.RegisterPlayerHit();
+            }
+
             if (currentHealth <= 0)
             {
                 Die();
             }
         }
+
 
         private void Die()
         {
@@ -64,18 +74,17 @@ namespace SG
             isDead = true;
             animator.Play("Death");
 
-            // Disable Collider after death
-            if (GetComponent<Collider>())
-            {
-                GetComponent<Collider>().enabled = false;
-            }
+            // Disable AI scripts to prevent movement/dodging
+            if (bossLocomotion != null) bossLocomotion.enabled = false;
+            if (bossDodgeHandler != null) bossDodgeHandler.enabled = false;
 
-            if (isBoss && bossHealthBar != null)
-            {
-                bossHealthBar.gameObject.SetActive(false); // Hide boss health bar
-            }
+            // Destroy the boss after 5 seconds
+            Invoke(nameof(DestroyBoss), 5f);
+        }
 
-            Destroy(gameObject, 5f); // Destroy enemy after 5 seconds
+        private void DestroyBoss()
+        {
+            Destroy(gameObject);
         }
     }
 }

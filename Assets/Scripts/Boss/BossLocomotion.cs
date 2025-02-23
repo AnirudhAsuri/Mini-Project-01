@@ -2,8 +2,9 @@ using UnityEngine;
 
 namespace SG
 {
-    public class BossLocomotion : MonoBehaviour
+    public class BossLocomotion : CharacterManager
     {
+        EnemyStats enemyStats;
         Animator bossAnimator;
         public Transform playerTransform;
         public Rigidbody bossRigidBody;
@@ -62,13 +63,14 @@ namespace SG
 
         public void HandleRotation()
         {
-            Vector3 targetPosition = playerTransform.position;
-            Vector3 targetDirection = targetPosition - transform.position;
-            targetDirection.y = 0;
-            targetDirection.Normalize();
+                Vector3 targetPosition = playerTransform.position;
+                Vector3 targetDirection = targetPosition - transform.position;
+                targetDirection.y = 0;
+                targetDirection.Normalize();
 
-            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+                Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            
         }
     }
 }
